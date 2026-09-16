@@ -1,42 +1,37 @@
-name: Build Executable
+name: Compilar Executable (.EXE)
 
 on:
   push:
-    branches:
-      - main
-      - master
     tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
+      - 'v*' # Se activa cuando creas un tag de versión, por ejemplo: v1.0.0
+  workflow_dispatch: # Permite ejecutar el proceso manualmente desde GitHub
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Descargar el código fuente
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Configurar Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller
+          pip install pyinstaller Pillow
+          if (Test-Path "requirements.txt") { pip install -r requirements.txt }
 
-      - name: Build EXE with PyInstaller
+      - name: Compilar con PyInstaller
         run: |
-          pyinstaller --noconfirm --onedir --windowed --icon="BT3_no_green.ico" --name "DBZ_STORY_EDITOR_DLC_EDITION" "DBZ STORY EDITOR 1.3.py"
+          pyinstaller --noconsole --onefile --name "BT3_Story_Mode_Editor" main.py
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Subir el ejecutable a GitHub Releases
+        uses: softprops/action-gh-release@v1
         with:
-          name: DBZ-STORY-EDITOR-Windows
-          path: dist/DBZ_STORY_EDITOR_DLC_EDITION/
+          files: dist/BT3_Story_Mode_Editor.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
