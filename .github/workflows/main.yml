@@ -1,10 +1,10 @@
-name: Compilar Executable (.EXE)
+name: Compilar a EXE
 
 on:
   push:
     tags:
-      - 'v*' # Se activa cuando creas un tag de versión, por ejemplo: v1.0.0
-  workflow_dispatch: # Permite ejecutar el proceso manualmente desde GitHub
+      - 'v*' # Se activa al publicar una etiqueta de versión (ej: v1.0, v1.0.0)
+  workflow_dispatch: # Permite compilar manualmente desde la pestaña Actions en GitHub
 
 jobs:
   build-windows:
@@ -14,7 +14,7 @@ jobs:
       - name: Descargar el código fuente
         uses: actions/checkout@v4
 
-      - name: Configurar Python 3.10
+      - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -25,11 +25,18 @@ jobs:
           pip install pyinstaller Pillow
           if (Test-Path "requirements.txt") { pip install -r requirements.txt }
 
-      - name: Compilar con PyInstaller
+      - name: Compilar ejecutable único (.EXE)
         run: |
           pyinstaller --noconsole --onefile --name "BT3_Story_Mode_Editor" main.py
 
-      - name: Subir el ejecutable a GitHub Releases
+      - name: Subir artefacto (para descargas manuales)
+        uses: actions/upload-artifact@v4
+        with:
+          name: BT3_Story_Mode_Editor_Windows
+          path: dist/BT3_Story_Mode_Editor.exe
+
+      - name: Crear Release en GitHub (cuando usas Tags)
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: dist/BT3_Story_Mode_Editor.exe
