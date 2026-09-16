@@ -3,9 +3,18 @@ import io
 import math
 import os
 import re
+import sys  # <-- Agrega "import sys" aquí arriba si no lo tienes
 import tkinter as tk
 from tkinter import colorchooser, filedialog, messagebox, ttk
 
+
+# --- FUNCIÓN PARA RUTAS EN PYINSTALLER ---
+def get_resource_path(relative_path):
+  """Obtiene la ruta absoluta del recurso, compatible con PyInstaller --onefile"""
+  if hasattr(sys, '_MEIPASS'):
+    return os.path.join(sys._MEIPASS, relative_path)
+  return os.path.join(os.path.abspath('.'), relative_path)
+  
 # --- DICCIONARIOS DE BT3 DE LA HERRAMIENTA 1 ---
 
 BGMS = {
