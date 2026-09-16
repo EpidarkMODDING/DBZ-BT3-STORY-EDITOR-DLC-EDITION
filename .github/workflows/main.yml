@@ -3,8 +3,8 @@ name: Compilar a EXE
 on:
   push:
     tags:
-      - 'v*' # Se activa al publicar una etiqueta de versión (ej: v1.0, v1.0.0)
-  workflow_dispatch: # Permite compilar manualmente desde la pestaña Actions en GitHub
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build-windows:
@@ -17,7 +17,7 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Instalar dependencias
         run: |
@@ -27,18 +27,18 @@ jobs:
 
       - name: Compilar ejecutable único (.EXE)
         run: |
-          pyinstaller --noconsole --onefile --name "BT3_Story_Mode_Editor" main.py
+          pyinstaller --noconfirm --onefile --windowed --icon="BT3_no_green.ico" --name "DBZ_STORY_EDITOR_DLC_EDITION" "DBZ_STORY_EDITOR_DLC_EDITION.py"
 
-      - name: Subir artefacto (para descargas manuales)
+      - name: Subir ejecutable a GitHub Actions
         uses: actions/upload-artifact@v4
         with:
-          name: BT3_Story_Mode_Editor_Windows
-          path: dist/BT3_Story_Mode_Editor.exe
+          name: DBZ_STORY_EDITOR_DLC_EDITION
+          path: dist/DBZ_STORY_EDITOR_DLC_EDITION.exe
 
       - name: Crear Release en GitHub (cuando usas Tags)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/BT3_Story_Mode_Editor.exe
+          files: dist/DBZ_STORY_EDITOR_DLC_EDITION.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
