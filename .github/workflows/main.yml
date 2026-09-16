@@ -1,10 +1,14 @@
-name: Compilar DBZ Story Editor a EXE
+name: Build Executable (Windows)
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -12,25 +16,29 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Obtener código del repositorio
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Instalar dependencias y PyInstaller
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
 
-    - name: Compilar ejecutable (.exe)
-      run: |
-        pyinstaller --noconfirm --onedir --windowed --name "DBZ_Story_Editor" "DBZ_STORY_EDITOR_DLC EDITION_2.py"
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller --noconfirm --onedir --windowed --name "DBZ_Story_Editor" "DBZ_STORY_EDITOR_DLC EDITION.py"
 
-    - name: Subir ejecutable compilado como Artefacto
-      uses: actions/upload-artifact@v4
-      with:
-        name: DBZ_Story_Editor_EXE
-        path: dist/DBZ_Story_Editor/
+      - name: Compress Build Output
+        run: |
+          powershell Compress-Archive -Path "dist/DBZ_Story_Editor" -DestinationPath "DBZ_Story_Editor_Windows.zip"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DBZ-Story-Editor-Executable
+          path: DBZ_Story_Editor_Windows.zip
