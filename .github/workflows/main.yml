@@ -1,44 +1,36 @@
-name: Compilar a EXE
+name: Compilar DBZ Story Editor a EXE
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
 
     steps:
-      - name: Descargar el código fuente
-        uses: actions/checkout@v4
+    - name: Obtener código del repositorio
+      uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller Pillow
-          if (Test-Path "requirements.txt") { pip install -r requirements.txt }
+    - name: Instalar dependencias y PyInstaller
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
 
-      - name: Compilar ejecutable único (.EXE)
-        run: |
-          pyinstaller --noconfirm --onefile --windowed --icon="BT3_no_green.ico" --name "DBZ_STORY_EDITOR_DLC_EDITION" "DBZ_STORY_EDITOR_DLC_EDITION.py"
+    - name: Compilar ejecutable (.exe)
+      run: |
+        pyinstaller --noconfirm --onedir --windowed --name "DBZ_Story_Editor" "DBZ_STORY_EDITOR_DLC EDITION_2.py"
 
-      - name: Subir ejecutable a GitHub Actions
-        uses: actions/upload-artifact@v4
-        with:
-          name: DBZ_STORY_EDITOR_DLC_EDITION
-          path: dist/DBZ_STORY_EDITOR_DLC_EDITION.exe
-
-      - name: Crear Release en GitHub (cuando usas Tags)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/DBZ_STORY_EDITOR_DLC_EDITION.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Subir ejecutable compilado como Artefacto
+      uses: actions/upload-artifact@v4
+      with:
+        name: DBZ_Story_Editor_EXE
+        path: dist/DBZ_Story_Editor/
